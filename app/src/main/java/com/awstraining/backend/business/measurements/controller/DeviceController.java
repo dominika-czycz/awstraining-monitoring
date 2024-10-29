@@ -34,17 +34,16 @@ class DeviceController implements DeviceIdApi {
 
     @Override
     public ResponseEntity<Measurement> publishMeasurements(final String deviceId, final Measurement measurement) {
-        Counter counter = registry.counter("publishMeasurements.counter", "key: method value: publishMeasurements");
+        registry.counter("publishMeasurements.counter", "method", "publishMeasurements").increment();
 
         LOGGER.info("Publishing measurement for device '{}'", deviceId);
         final MeasurementDO measurementDO = fromMeasurement(deviceId, measurement);
         service.saveMeasurement(measurementDO);
-        counter.increment();
         return ResponseEntity.ok(measurement);
     }
     @Override
     public ResponseEntity<Measurements> retrieveMeasurements(final String deviceId) {
-        Counter counter = registry.counter("retrieveMeasurements.counter", "key: method value: retrieveMeasurements");
+        registry.counter("retrieveMeasurements.counter", "method", "retrieveMeasurements").increment();
         LOGGER.info("Retrieving all measurements for device '{}'", deviceId);
         final List<Measurement> measurements = service.getMeasurements()
                 .stream()
@@ -53,7 +52,6 @@ class DeviceController implements DeviceIdApi {
         final Measurements measurementsResult = new Measurements();
         measurementsResult.measurements(measurements);
         LOGGER.info("Measurements size '{}'", measurements.size());
-        counter.increment();
         return ResponseEntity.ok(measurementsResult);
     }
 
